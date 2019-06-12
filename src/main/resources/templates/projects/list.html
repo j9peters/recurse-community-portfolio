@@ -18,7 +18,7 @@
       >
         <a
           href="projects/public.html"
-          data-th-href="@{/project/{id}(id=${project.projectId})}"
+          data-th-href="@{/project/{id}/{slug}(id=${project.projectId},slug=${project.slugifiedName})}"
           data-th-text="${project.name}"
         >Project Name</a>,
         by
