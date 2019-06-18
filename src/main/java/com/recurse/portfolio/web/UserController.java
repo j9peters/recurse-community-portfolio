@@ -96,7 +96,7 @@ public class UserController {
             );
     }
 
-    @GetMapping("/user/{userId}/edit")
+    @GetMapping("/user/edit/{userId}")
     public ModelAndView getEditMyProfile(
         @CurrentUser User currentUser,
         @PathVariable Integer userId
@@ -115,7 +115,7 @@ public class UserController {
             .addObject("user", requestedUser);
     }
 
-    @PostMapping("/user/{id}/edit")
+    @PostMapping("/user/edit/{id}")
     public ModelAndView postEditMyProfile(
         @CurrentUser User currentUser,
         @PathVariable(name = "id") Integer userId,
