@@ -28,7 +28,7 @@
         >
           <a
             href="users/public.html"
-            data-th-href="@{/user/{id}(id=${author.userId})}"
+            data-th-href="@{/user/{id}/{slug}(id=${author.userId}, slug=${author.slugifiedName})}"
             data-th-text="${author.name}"
           >Author Name</a><span
             data-th-if="not ${authorStat.last}"

@@ -1,5 +1,6 @@
 package com.recurse.portfolio.web;
 
+import com.github.slugify.Slugify;
 import com.recurse.portfolio.data.DisplayProjectRepository;
 import com.recurse.portfolio.data.User;
 import com.recurse.portfolio.data.UserRepository;
@@ -31,10 +32,20 @@ public class UserController {
     @Autowired
     UserRepository repository;
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userId}/**")
+    public ModelAndView showUserRedirect(
+        @CurrentUser User currentUser,
+        @PathVariable Integer userId,
+        Pageable pageable
+    ) {
+        return showUser(currentUser, userId, "", pageable);
+    }
+
+    @GetMapping("/user/{userId}/{userName}")
     public ModelAndView showUser(
         @CurrentUser User currentUser,
         @PathVariable Integer userId,
+        @PathVariable String userName,
         Pageable pageable
     ) {
         User requestedUser = repository.findById(userId)
@@ -48,6 +59,24 @@ public class UserController {
         );
 
         var mv = new ModelAndView(policy.evaluate(requestedUser, currentUser));
+
+        var namePolicy = new VisibilityPolicy<>(
+                requestedUser.getProfileVisibility(),
+                requestedUser.getInternalName(),
+                requestedUser.getInternalName(),
+                requestedUser.getPublicName()
+        );
+
+        String name = namePolicy.evaluate(requestedUser, currentUser);
+
+        Slugify slugifier = new Slugify();
+        String slugifiedName = slugifier.slugify(name);
+
+        if (!slugifiedName.equals(userName)) {
+            return new ModelAndView(new RedirectView(
+                    "/user/" + userId + "/" + slugifiedName
+            ));
+        }
 
         requestedUser.setPublicBio(renderMarkdownToHtml(
             requestedUser.getPublicBio()
